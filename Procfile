@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn test_django.wsgi --log-file -
+web: gunicorn emp_db.wsgi --log-file -
