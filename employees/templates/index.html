@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <title>Emp DB app</title>
+    <meta name=”description” content="Sample Employee DB app written on Django/DRF/VueJS/BS">
+    <meta name=”keywords” content="django, drf, vuejs">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <div class="row">
+          <h1>
+            List of Employees
+            <button class="btn btn-success" data-toggle="modal" data-target="#addEmpModal">ADD Employee</button>
+          </h1>
+
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th>First name</th>
+                <th>Second name</th>
+                <th>BD</th>
+                <th>Dept</th>
+                <th>Project</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="emp in emps">
+                <th scope="row">${ emp.emp_number }</th>
+                <td>${ emp.first_name }</td>
+                <td>${ emp.second_name }</td>
+                <td>${ emp.birth_date }</td>
+                <td>${ emp.dept_name }</td>
+                <td>${ emp.project_name }</td>
+                <td style="white-space: nowrap;">
+                  <button class="btn btn-info" v-on:click="getEmp(emp.id)">Edit</button>
+                  <button class="btn btn-danger" v-on:click="delEmp(emp.id)">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="loading" v-if="loading===true">Loading...</div>
+
+
+
+      <!-- Add Employee Modal -->
+          <div class="modal fade" id="addEmpModal" tabindex="-1" role="dialog" aria-labelledby="addEmpModalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="addEmpModalTitle">Add new Employee</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form v-on:submit.prevent="addEmp()">
+                    <div class="modal-body">
+                        <div class="form-group">
+                          <label for="emp_number">Employee Number</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="emp_number"
+                            placeholder="Enter Employee Number"
+                            v-model="newEmp.emp_number"
+                            required="required" >
+                        </div>
+                        <div class="form-group">
+                          <label for="first_name">First Name</label>
+                          <input
+                            class="form-control"
+                            id="first_name"
+                            placeholder="Enter First name"
+                            v-model="newEmp.first_name"
+                            required="required" >
+                        </div>
+                        <div class="form-group">
+                          <label for="second_name">Second Name</label>
+                          <input
+                            class="form-control"
+                            id="second_name"
+                            placeholder="Enter Second name"
+                            v-model="newEmp.second_name"
+                            required="required" >
+                        </div><div class="form-group">
+                          <label for="bd">Birth Date</label>
+                          <input
+                            class="form-control"
+                            id="bd"
+                            placeholder="Enter BD"
+                            v-model="newEmp.birth_date"
+                            required="required" >
+                        </div><div class="form-group">
+                          <label for="dept_name">Department</label>
+                          <input
+                            class="form-control"
+                            id="dept_name"
+                            placeholder="Enter Department"
+                            v-model="newEmp.dept_name"
+                            required="required" >
+                        </div><div class="form-group">
+                          <label for="project_name">Project</label>
+                          <input
+                            class="form-control"
+                            id="project_name"
+                            placeholder="Enter Project"
+                            v-model="newEmp.project_name"
+                            required="required" >
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+              </div>
+            </div>
+           <div class="loading" v-if="loading===true">Loading...</div>
+          </div>
+          <!-- End of add emp modal -->
+
+    </div>
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <!--  VueJS -->
+    <!--         DEV -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!--         PROD -->
+    {#    <script src="https://cdn.jsdelivr.net/npm/vue"></script>#}
+    <!-- VueJS Resource - lib for Ajax calls (HTTP client) -->
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+
+
+
+    <script defer>
+        Vue.http.headers.common['X-CSRFToken'] = "{{ csrf_token }}";
+
+        var app = new Vue({
+          el: "#app",
+          delimiters: ["${", "}"],
+          data: {
+            emps: [],
+            loading: false,
+            currentEmp: {},
+            newEmp: {
+              emp_number: "",
+              first_name: "",
+              second_name: "",
+              birth_date: "",
+              dept_name: "",
+              project_name: ""
+            }
+          },
+          methods: {
+            getEmps: function () {
+              this.loading = true;
+{#              {% url 'myproj:artist-list' %}#}
+              this.$http.get("/api/employee/")
+                .then((response) => {
+                  this.emps = response.data;
+                  this.loading = false;
+                })
+                .catch((err) => {
+                  this.loading = false;
+                  console.log(err);
+                })
+            },
+            addEmp: function() {
+              this.loading = true;
+              this.$http.post('/api/employee/', this.newEmp)
+                  .then((response) => {
+                    this.loading = true;
+                    this.getEmps();
+                  })
+                  .catch((err) => {
+                    this.loading = true;
+                    console.log(err);
+                  }).finally(()=>{
+                    $('#addEmpModal').modal('hide');
+              })
+            },
+          },
+          mounted: function () {
+            this.getEmps();
+          }
+        })
+    </script>
+
+
+
+
+
+
+
+  </body>
+</html>
