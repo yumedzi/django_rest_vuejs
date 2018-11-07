@@ -41,11 +41,11 @@
                 <td>${ emp.first_name }</td>
                 <td>${ emp.second_name }</td>
                 <td>${ emp.birth_date }</td>
-                <td>${ emp.dept_name }</td>
-                <td>${ emp.project_name }</td>
+                <td><span v-if="emp.department">${ emp.department.name }</span></td>
+                <td><span v-if="emp.department">${ emp.department.project.name }</span></td>
                 <td style="white-space: nowrap;">
-                  <button class="btn btn-info" v-on:click="getEmp(emp.id)">Edit</button>
-                  <button class="btn btn-danger" v-on:click="delEmp(emp.id)">Delete</button>
+                  <button class="btn btn-info" v-on:click="getEmp(emp)">Edit</button>
+                  <button class="btn btn-danger" v-on:click="delEmp(emp)">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -103,22 +103,12 @@
                         placeholder="Enter BD"
                         v-model="newEmp.birth_date"
                         required="required" >
-                    </div><div class="form-group">
-                      <label for="dept_name">Department</label>
-                      <input
-                        class="form-control"
-                        id="dept_name"
-                        placeholder="Enter Department"
-                        v-model="newEmp.dept_name"
-                        required="required" >
-                    </div><div class="form-group">
-                      <label for="project_name">Project</label>
-                      <input
-                        class="form-control"
-                        id="project_name"
-                        placeholder="Enter Project"
-                        v-model="newEmp.project_name"
-                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="department">Department</label>
+                      <select class="form-control" id="department" v-model="newEmp.department">
+                          <option v-for="d in depts" v-bind:value="d">${d.name} of ${d.project.name}</option>
+                      </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -131,6 +121,73 @@
        <div class="loading" v-if="loading===true">Loading...</div>
       </div>
       <!-- End of add emp modal -->
+
+
+      <!-- EDIT Employee Modal -->
+      <div class="modal fade" id="editEmpModal" tabindex="-1" role="dialog" aria-labelledby="editEmpModalTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editEmpModalTitle">Edit Employee</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form v-on:submit.prevent="editEmp(currentEmp.id)">
+                <div class="modal-body">
+                    <div class="form-group">
+                      <label for="emp_number">Employee Number</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="emp_number"
+                        placeholder="Enter Employee Number"
+                        v-model="currentEmp.emp_number"
+                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="first_name">First Name</label>
+                      <input
+                        class="form-control"
+                        id="first_name"
+                        placeholder="Enter First name"
+                        v-model="currentEmp.first_name"
+                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="second_name">Second Name</label>
+                      <input
+                        class="form-control"
+                        id="second_name"
+                        placeholder="Enter Second name"
+                        v-model="currentEmp.second_name"
+                        required="required" >
+                    </div><div class="form-group">
+                      <label for="bd">Birth Date</label>
+                      <input
+                        class="form-control"
+                        id="bd"
+                        placeholder="Enter BD"
+                        v-model="currentEmp.birth_date"
+                        required="required" >
+                    </div>
+                    <div class="form-group">
+                      <label for="department">Department</label>
+                      <select class="form-control" id="department" v-model="currentEmp.department">
+                          <option v-for="d in depts" v-bind:value="d">${d.name} of ${d.project.name}</option>
+                      </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+          </div>
+        </div>
+       <div class="loading" v-if="loading===true">Loading...</div>
+      </div>
+      <!-- End of edit emp modal -->
 
     </div>
 
@@ -160,6 +217,7 @@
           delimiters: ["${", "}"],
           data: {
             emps: [],
+            depts: [],
             loading: false,
             currentEmp: {},
             newEmp: {
@@ -167,42 +225,79 @@
               first_name: "",
               second_name: "",
               birth_date: "",
-              dept_name: "",
-              project_name: ""
+              department: null,
             }
           },
           methods: {
             getEmps: function () {
               this.loading = true;
-{#              {% url 'myproj:artist-list' %}#}
               this.$http.get("/api/employee/")
-{#              this.$http.get("{% url "employees:employee-list" %}")#}
                 .then((response) => {
                   this.emps = response.data;
-                  this.loading = false;
                 })
                 .catch((err) => {
-                  this.loading = false;
                   console.log(err);
+                }).finally(()=>{
+                  this.loading = false;
+              })
+            },
+            getDepts: function () {
+              this.loading = true;
+              this.$http.get("/api/department/")
+                .then((response) => {
+                  this.depts = response.data;
                 })
+                .catch((err) => {
+                  console.log(err);
+                }).finally(()=>{
+                  this.loading = false;
+              })
             },
             addEmp: function() {
               this.loading = true;
               this.$http.post('/api/employee/', this.newEmp)
                   .then((response) => {
-                    this.loading = true;
+                    {#this.getEmps();#}
+                    this.emps.push(response.data);
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  }).finally(()=>{
+                    this.loading = false;
+                    $('#addEmpModal').modal('hide');
+              })
+            },
+            getEmp: function(emp) {
+              this.currentEmp = emp;
+              $('#editEmpModal').modal('show');
+            },
+            editEmp: function(emp_id) {
+              this.loading = true;
+              this.$http.put('/api/employee/' + emp_id + "/", this.currentEmp)
+                  .then((response) => {
                     this.getEmps();
                   })
                   .catch((err) => {
-                    this.loading = true;
                     console.log(err);
                   }).finally(()=>{
-                    $('#addEmpModal').modal('hide');
+                    this.loading = false;
+                    $('#editEmpModal').modal('hide');
               })
+            },
+            delEmp: function(emp) {
+              this.loading = true;
+              this.$http.delete('/api/employee/' + emp.id + "/")
+                  .then((response) => {
+                    this.getEmps();
+                  })
+                  .catch((err) => {
+                    console.log(err);
+                  })
             },
           },
           mounted: function () {
             this.getEmps();
+            this.getDepts();
           }
         })
     </script>
