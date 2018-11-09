@@ -23,60 +23,71 @@
 
       <div class="container container-fluid">
           <!-- NAVIGATION -->
-      <nav class="navbar navbar-expand navbar-light bg-light">
-                  <a class="navbar-brand" href="#"><img height="20" src="{% static 'img/user.png' %}"> Emp DB</a>
-                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                  </button>
+          <nav class="navbar navbar-expand navbar-light bg-light" style="">
+              <a class="navbar-brand" href="#"><img height="20" src="{% static 'img/user.png' %}"> Emp DB</a>
+              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
 
-                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-                      <li class="nav-item active">
-                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="/">List of employees</a>
-                      </li>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/">List of employees</a>
+                  </li>
 
-                    </ul>
-                    <a href="{% url 'logout' %}" class="btn btn-info">Logout</a>
-                  </div>
-                </nav>
+
+                </ul>
+                <ul class="navbar-nav pull-right">
+                  <li class="nav-item disabled pull-right">
+                    <a class="nav-link disabled">Logged  in as: {{ request.user.username }}</a>
+                  </li>
+                </ul>
+
+                <a href="{% url 'logout' %}" class="btn btn-info">Logout</a>
+              </div>
+        </nav>
+
 
         <!-- CONTENT -->
-        <div class="row">
-          <h1>
-            List of Employees
-            <button class="btn btn-success" data-toggle="modal" data-target="#addEmpModal">ADD Employee</button>
-          </h1>
+        <div class="row" style="margin-top: 15px;">
+          <div class="col">
+              <h1>
+                List of Employees
+                <button class="btn btn-success" data-toggle="modal" data-target="#addEmpModal">ADD Employee</button>
+              </h1>
 
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th>First name</th>
-                <th>Second name</th>
-                <th>BD</th>
-                <th>Dept</th>
-                <th>Project</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="emp in emps">
-                <th scope="row">${ emp.emp_number }</th>
-                <td>${ emp.first_name }</td>
-                <td>${ emp.second_name }</td>
-                <td>${ emp.birth_date }</td>
-                <td><span v-if="emp.department">${ emp.department.name }</span></td>
-                <td><span v-if="emp.department">${ emp.department.project.name }</span></td>
-                <td style="white-space: nowrap;">
-                  <button class="btn btn-info" v-on:click="getEmp(emp)">Edit</button>
-                  <button class="btn btn-danger" v-on:click="delEmp(emp)">Delete</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th>First name</th>
+                    <th>Second name</th>
+                    <th>BD</th>
+                    <th>Dept</th>
+                    <th>Project</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="emp in emps">
+                    <th scope="row">${ emp.emp_number }</th>
+                    <td>${ emp.first_name }</td>
+                    <td>${ emp.second_name }</td>
+                    <td>${ emp.birth_date }</td>
+                    <td><span v-if="emp.department">${ emp.department.name }</span></td>
+                    <td><span v-if="emp.department">${ emp.department.project.name }</span></td>
+                    <td style="white-space: nowrap;">
+                      <button class="btn btn-info" v-on:click="getEmp(emp)">Edit</button>
+                      <button class="btn btn-danger" v-on:click="delEmp(emp)">Delete</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+
         </div>
       </div>
       <div class="loading" v-if="loading===true">Loading...</div>
