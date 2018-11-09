@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <!-- Spinner -->
     <link rel="stylesheet" href="{% static 'css/spinner.css' %}">
+    <!-- Datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css">
+
   </head>
   <body>
     <div id="app">
@@ -98,7 +101,7 @@
                     </div><div class="form-group">
                       <label for="bd">Birth Date</label>
                       <input
-                        class="form-control"
+                        class="form-control datepicker"
                         id="bd"
                         placeholder="Enter BD"
                         v-model="newEmp.birth_date"
@@ -165,7 +168,7 @@
                     </div><div class="form-group">
                       <label for="bd">Birth Date</label>
                       <input
-                        class="form-control"
+                        class="form-control datepicker"
                         id="bd"
                         placeholder="Enter BD"
                         v-model="currentEmp.birth_date"
@@ -206,6 +209,8 @@
     {#    <script src="https://cdn.jsdelivr.net/npm/vue"></script>#}
     <!-- VueJS Resource - lib for Ajax calls (HTTP client) -->
     <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <!-- Datepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
 
 
 
@@ -257,7 +262,6 @@
               this.loading = true;
               this.$http.post('/api/employee/', this.newEmp)
                   .then((response) => {
-                    {#this.getEmps();#}
                     this.emps.push(response.data);
                   })
                   .catch((err) => {
@@ -268,36 +272,48 @@
               })
             },
             getEmp: function(emp) {
-              this.currentEmp = emp;
+              this.currentEmp = Object.assign({}, emp);
               $('#editEmpModal').modal('show');
             },
             editEmp: function(emp_id) {
               this.loading = true;
-              this.$http.put('/api/employee/' + emp_id + "/", this.currentEmp)
+              this.$http.put('/api/employee/' + emp_id + '/', this.currentEmp)
                   .then((response) => {
-                    this.getEmps();
+                    let idx = this.emps.findIndex(x => x.id === emp_id);
+                    this.emps[idx] = response.data;
                   })
                   .catch((err) => {
                     console.log(err);
-                  }).finally(()=>{
+                  })
+                  .finally(()=> {
                     this.loading = false;
                     $('#editEmpModal').modal('hide');
-              })
+                  })
             },
             delEmp: function(emp) {
               this.loading = true;
+
               this.$http.delete('/api/employee/' + emp.id + "/")
                   .then((response) => {
-                    this.getEmps();
+                    this.emps.splice(this.emps.indexOf(emp), 1);
                   })
                   .catch((err) => {
                     console.log(err);
                   })
+                  .finally(() => {
+                    this.loading = false;
+                  });
             },
           },
           mounted: function () {
             this.getEmps();
             this.getDepts();
+            $('.modal-body input.datepicker').datepicker({
+              format: 'yyyy-mm-dd'
+            }).on('hide', function(event) {
+              event.preventDefault();
+              event.stopPropagation();
+            });
           }
         })
     </script>
